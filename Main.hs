@@ -1,6 +1,7 @@
 module Main where
 
 import Convert
+import Data.Maybe (fromMaybe)
 import Options.Applicative hiding (action)
 import System.Directory (doesFileExist)
 import System.Environment (getArgs)
@@ -64,3 +65,39 @@ out =
         <> metavar "FILE"
         <> help "Output file"
     )
+
+pInputFile :: Parser SingleInput
+pInputFile = fmap InputFile inp
+
+pOutputFile :: Parser SingleOutput
+pOutputFile = OutputFile <$> out
+
+pConvertSingle :: Parser Options
+pConvertSingle = ConvertSingle <$> pInputFile <*> pOutputFile
+
+pInputDir :: Parser FilePath
+pInputDir =
+  strOption
+    ( long "input"
+        <> short 'i'
+        <> metavar "DIRECTORY"
+        <> help "Input directory"
+    )
+
+pOutputDir :: Parser FilePath
+pOutputDir =
+  strOption
+    ( long "output"
+        <> short 'o'
+        <> metavar "DIRECTORY"
+        <> help "Output directory"
+    )
+
+pConvertDir :: Parser Options
+pConvertDir =
+  ConvertDir <$> pInputDir <*> pOutputDir
+
+pSingleInput :: Parser SingleInput
+pSingleInput = fromMaybe Stdin <$> optional pInputFile
+
+pSingleOutput :: Parser SingleOutput
